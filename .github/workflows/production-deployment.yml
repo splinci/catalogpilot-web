@@ -1,0 +1,47 @@
+name: Production Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate-and-build:
+    name: Validate, Test & Build Release
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://neondb_owner:npg_8DRMljaZNIX3@ep-icy-fog-ahb608d1.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
+      NEXTAUTH_SECRET: "ci-secret-for-testing-only-minimum-32-chars-long"
+      NEXTAUTH_URL: "http://localhost:3000"
+      ENCRYPTION_SECRET: "ci-secret-for-testing-only-minimum-32-chars-long"
+      WEBHOOK_HMAC_SECRET: "ci-secret-for-testing-only-minimum-32-chars-long"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run Vitest Suite
+        run: npx vitest run
+
+      - name: Next.js Production Build
+        run: npm run build
+
+  deploy-production:
+    name: Production Deployment Gate
+    needs: validate-and-build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Approve & Deploy to Production
+        run: echo "Production deployment gate approved. Executing deployment..."

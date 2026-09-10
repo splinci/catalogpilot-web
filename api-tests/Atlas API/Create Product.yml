@@ -1,0 +1,33 @@
+info:
+  name: Create Product
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: http://localhost:3000/api/inventory/products
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "sku": "SKU-002",
+        "name": "Mechanical Keyboard",
+        "description": "RGB Mechanical Keyboard",
+        "category": "Accessories",
+        "brand": "Logitech",
+        "barcode": "9876543210123",
+        "unit": "pcs",
+        "costPrice": 45,
+        "sellingPrice": 79.99,
+        "minimumStock": 5
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

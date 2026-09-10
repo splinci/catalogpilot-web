@@ -1,0 +1,39 @@
+/**
+ * ============================================================================
+ * Splinci Commerce OS — Stabilization Summaries REST API
+ * ============================================================================
+ * Specification Reference: GO-001 / API-005 / GOLIVE-001 / IAM-002
+ * Route: GET /api/operations/go-live/stabilization
+ * ============================================================================
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentSession } from "../../../../../lib/auth";
+import { authorizationService } from "../../../../../services/authorization.service";
+import { operationsService } from "../../../../../services/operations.service";
+
+export async function GET(req: NextRequest) {
+  try {
+    const session = await getCurrentSession();
+    if (!session) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!authorizationService.hasPermission(session.role, "operations:read")) {
+      return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+    }
+
+    const stabilization24h = await operationsService.goLive.get24HourStabilizationSummary(session.companyId);
+    const stabilization7d = await operationsService.goLive.get7DayStabilizationSummary(session.companyId);
+
+    return NextResponse.json({
+      success: true,
+      data: { stabilization24h, stabilization7d },
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message || "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

@@ -1,0 +1,26 @@
+info:
+  name: PATCH
+  type: http
+  seq: 6
+
+http:
+  method: PATCH
+  url: http://localhost:3000/api/inventory/products/cmrl0oajt00008ku94yqkp2br
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      {
+        "sellingPrice": 34.99,
+        "minimumStock": 20,
+        "description": "Updated ergonomic wireless mouse"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
